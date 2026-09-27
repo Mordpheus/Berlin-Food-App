@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Berlin Food Liste für Schnumami (Jenny)</title>
+    <!-- Google Fonts für Comic-Style & modernen Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- PWA Verknüpfungen -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#f4c430">
+    <link rel="apple-touch-icon" href="schnuddi_icon.png">
+
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+        });
+    }
+    </script>
+    
+    <style>
+        :root {
+            --primary: #ff5a5f;
+            --secondary: #f4c430;
+            --text-dark: #2c3e50;
+            --text-muted: #6c757d;
+            --card-bg: rgba(255, 255, 255, 0.92);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            color: var(--text-dark);
+            /* Dein Bild-Hintergrund eingebunden */
+            background-image: url('bg_muster.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding-bottom: 40px;
+        }
+
+        /* Header / App Bar */
+        .app-header {
+            background: linear-gradient(135deg, #f4c430, #ff8c00);
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        .app-icon {
+            width: 55px;
+            height: 55px;
+            border-radius: 16px;
+            object-fit: cover;
+            border: 2px solid white;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        .app-header h1 {
+            font-family: 'Fredoka', cursive;
+            font-size: 1.3rem;
+            line-height: 1.2;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+
+        /* Hero / Titelbild */
+        .hero-image-container {
+            width: 100%;
+            text-align: center;
+            padding: 15px 15px 0 15px;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-height: 450px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Comic Einstiegsgeschichte */
+        .story-card {
+            background: var(--card-bg);
+            margin: 15px;
+            padding: 20px;
+            border-radius: 20px;
+            border: 3px solid #f4c430;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .story-title {
+            font-family: 'Fredoka', cursive;
+            color: #d9534f;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .story-text {
+            font-family: 'Fredoka', cursive;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            color: #333;
+            text-align: justify;
+        }
+
+        .inline-img {
+            width: 100%;
+            border-radius: 15px;
+            margin: 15px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* External Link Box */
+        .ext-link-box {
+            margin: 15px;
+            text-align: center;
+        }
+
+        .ext-btn {
+            background: #4a90e2;
+            color: white;
+            padding: 12px 18px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.1s;
+        }
+
+        .ext-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Preis-Legende */
+        .price-legend {
+            background: #ffffff;
+            margin: 15px;
+            padding: 12px 15px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            color: var(--text-dark);
+            border-left: 5px solid var(--secondary);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .price-legend strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #d9534f;
+        }
+
+        /* Tabs für Kategorien */
+        .category-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px;
+            background: rgba(255,255,255,0.85);
+            padding: 5px;
+            border-radius: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 25px;
+            background: transparent;
+            font-family: 'Fredoka', cursive;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 3px 8px rgba(255, 90, 95, 0.4);
+        }
+
+        /* Restaurant-Karten */
+        .restaurant-list {
+            padding: 0 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .restaurant-card {
+            background: var(--card-bg);
+            border-radius: 18px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .res-title {
+            font-family: 'Fredoka', cursive;
+            font-size: 1.15rem;
+            color: var(--text-dark);
+        }
+
+        .res-cuisine {
+            background: #e1f5fe;
+            color: #0288d1;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .res-address {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .res-special {
+            background: #fff3e0;
+            color: #e65100;
+            font-size: 0.8rem;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed #eee;
+        }
+
+        .res-price {
+            font-weight: 700;
+            color: #2e7d32;
+            font-size: 0.95rem;
+        }
+
+        .map-link {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(255, 90, 95, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Modal / Popup */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 22px;
+            border-radius: 20px;
+            width: 85%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h3 {
+            font-family: 'Fredoka', cursive;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+
+        .modal-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 18px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .modal-btn.confirm {
+            background: var(--primary);
+            color: white;
+        }
+
+        .modal-btn.cancel {
+            background: #e0e0e0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <div class="app-header">
+        <img class="app-icon" src="schnuddi_icon.png" alt="App Icon">
+        <h1>Berlin Food Liste<br><small style="font-size: 0.8rem; font-weight: 400;">für Schnumami (Jenny)</small></h1>
+    </div>
+
+    <!-- Title / Hero Image -->
+    <div class="hero-image-container">
+        <img class="hero-image" src="titelbild.jpg" alt="Titelbild King Schnu und Jenny">
+    </div>
+
+    <!-- Einstiegsgeschichte im Comic-Style -->
+    <div class="story-card">
+        <div class="story-title">✨ Das Abenteuer Berlin beginnt! ✨</div>
+        <div class="story-text">
+            Es war einmal eine epische Food-Expedition im Herzen Berlins! Die drei unzertrennlichen Abenteurer standen bereit: <strong>Taddy</strong>, mit dem feinen Gaumen, der stets für die gute Stimmung zuständig war, <strong>Jenny</strong> (von Schnu liebevoll Schnumami oder Mamsi genannt), die heimliche Chefin der Truppe mit dem Plan und der Orientierung mit Blick auf den nächsten Snack, und natürlich <strong>Schnuddi</strong>, weltbekannter Karriere-Mann, Stuntman und Globetrotter bekannt unter seinen zahllosen Decknamen wie Schnuster, Schnuddolski, Schnutiggyti oder ganz schlicht Ihro Majestät King Schnu erster seines Namens, König der Andalen und ersten Menschen…<br><br>
+            Das Ziel der Reise? Ganz klar: Berlin kulinarisch komplett aufmischen!<br><br>
+            Der Plan stand felsenfest: Es wird von Foodspot zu Foodspot marschiert, denn echte Sehenswürdigkeiten interessieren die drei eigentlich nur, wenn sie rein zufällig direkt neben einem legendären Dönerstand, einer erstklassigen Ramen-Bar oder einer hippen Bäckerei liegen. In diesem Fall wird kurz und schmerzlos ein schnelles Beweisfoto vor dem Brandenburger Tor geknipst, und zwar nur, während man sich schon die Schnute mit dem nächsten Leckerbissen vollstopft!<br><br>
+            Und die anderen Touristen oder Passanten? Völlig unbewusst dackeln sie an den Dreien vorbei. Menschen sind auf diesem Trip ohnehin nur dekorative Statistendummies und Hindernisse. Ernsthaft gesagt, viel zu doof und völlig uninteressant, um King Schnu und seine Crew von der nächsten kulinarischen Offenbarung abzulenken.<br><br>
+            Die Messer waren gewetzt, die Bäuche leer und der Stadtplan mit bunten Essen-Pins übersät: Das Abenteuer Berlin kann beginnen!
+        </div>
+
+        <!-- Bild unter der Geschichte -->
+        <img class="inline-img" src="story_map.jpg" alt="Schnuddi's Bites Map">
+    </div>
+
+    <!-- External Link Button -->
+    <div class="ext-link-box">
+        <button class="ext-btn" onclick="openExternalLink('https://www.berlinfoodstories.com/')">
+            🌐 Berlin Food Stories (Externe Website)
+        </button>
+    </div>
+
+    <!-- Bild Zwischenschub: Schnuddi Foodtruck -->
+    <div style="padding: 0 15px;">
+        <img class="inline-img" src="schnuddi_foodtruck.png" alt="Schnuddi Foodtruck">
+    </div>
+
+    <!-- Preis-Legende -->
+    <div class="price-legend">
+        <strong>💰 Preis-Kategorien (Sterne):</strong>
+        ⭐ = bis 10€ | ⭐⭐ = 10–20€ | ⭐⭐⭐ = 20–30€ | ⭐⭐⭐⭐+ = ab 30€
+    </div>
+
+    <!-- Kategorie Tabs -->
+    <div class="category-tabs">
+        <button class="tab-btn active" onclick="switchTab('fruehstueck')">🥐 Frühstück</button>
+        <button class="tab-btn" onclick="switchTab('hauptspeisen')">🍜 Mittag / Abend</button>
+    </div>
+
+    <!-- Bild Zwischenschub: Schnuddi Ramen -->
+    <div style="padding: 0 15px; text-align: center;">
+        <img class="inline-img" style="max-width: 280px;" src="schnuddi_ramen.png" alt="Schnuddi mit Ramen">
+    </div>
+
+    <!-- Restaurant Liste -->
+    <div class="restaurant-list" id="restaurantContainer">
+        <!-- Wird dynamisch per JS befüllt -->
+    </div>
+
+    <!-- Bild Abschluss / Festmahl -->
+    <div style="padding: 15px 15px 0 15px;">
+        <img class="inline-img" src="schnuddi_festmahl.jpg" alt="Schnuddi Festmahl">
+    </div>
+
+</div>
+
+<!-- Popup Modal für externe Links -->
+<div class="modal-overlay" id="linkModal">
+    <div class="modal-card">
+        <h3>Achtung, externer Link! 🌐</h3>
+        <p>Du verlässt jetzt die App und wirst zu einer externen Webseite weitergeleitet.</p>
+        <div class="modal-buttons">
+            <button class="modal-btn cancel" onclick="closeModal()">Abbrechen</button>
+            <button class="modal-btn confirm" id="confirmLinkBtn">Weiter</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Restaurant Datenbank basierend auf deinem Dokument
+    const data = {
+        fruehstueck: [
+            {
+                name: "City Chicken Breakfast",
+                adresse: "Weichselstraße 12, 12045 Berlin",
+                kueche: "Libanesisch",
+                preis: "⭐ (5–10€)",
+                special: null,
+                maps: "https://maps.google.com/?q=City+Chicken+Breakfast+Weichselstraße+12+Berlin"
+            },
+            {
+                name: "La Maison",
+                adresse: "Paul-Lincke-Ufer 17, 10999 Berlin",
+                kueche: "Französisch / Croissants",
+                preis: "⭐–⭐⭐",
+                special: "🥐 Erstklassige Backwaren & Cafe",
+                maps: "https://maps.app.goo.gl/nzUXisAK6dCs7mXw9"
+            },
+            {
+                name: "A Never Ending Lovestory",
+                adresse: "Kantstraße 25, 10623 Berlin (Charlottenburg-Wilmersdorf)",
+                kueche: "Mix / Pancakes",
+                preis: "⭐⭐–⭐⭐⭐",
+                special: "🥞 Pancakes als Hauptakteur",
+                maps: "https://maps.app.goo.gl/KXbvNeqtxV4CCXsR6"
+            },
+            {
+                name: "Mr Minsch",
+                adresse: "Yorckstraße 15, 10965 Berlin (Friedrichshain-Kreuzberg)",
+                kueche: "Deutsch / Torten",
+                preis: "⭐",
+                special: "🍰 Hausgemachte Tortenträume",
+                maps: "https://maps.app.goo.gl/FmPonzABd6ZNxFQs7"
+            }
+        ],
+        hauptspeisen: [
+            {
+                name: "Sabor A Mi [Food Truck]",
+                adresse: "Hermann-Stöhr-Platz, 10243 Berlin",
+                kueche: "Mexikanisch",
+                preis: "⭐ (5–10€)",
+                special: "🚚 Food Truck Special",
+                maps: "https://maps.google.com/?q=Sabor+A+Mi+Food+Truck+Berlin"
+            },
+            {
+                name: "Nahs City Chicken",
+                adresse: "Karl-Marx-Platz 3 / Torstraße 125 / Stuttgarter Platz 10",
+                kueche: "Levantinisch",
+                preis: "⭐⭐–⭐⭐⭐ (15–30€)",
+                special: "🍗 Legendäres Broiler Hähnchen",
+                maps: "https://maps.app.goo.gl/UYqksB41HUuvpbj48"
+            },
+            {
+                name: "Yarok",
+                adresse: "Torstraße 195, 10115 Berlin",
+                kueche: "Syrisch",
+                preis: "⭐ (6–10€)",
+                special: null,
+                maps: "https://maps.google.com/?q=Yarok+Torstraße+195+Berlin"
+            },
+            {
+                name: "Ishin",
+                adresse: "Mittelstraße 24, 10117 Berlin",
+                kueche: "Japanisch / Sushi",
+                preis: "⭐–⭐⭐ (5–20€)",
+                special: "🍣 Happyhour bis 16:00 Uhr!",
+                maps: "https://maps.app.goo.gl/XUnGxUbuVcwMyrJo8"
+            },
+            {
+                name: "Wen Cheng",
+                adresse: "Schönhauser Allee 10, 10119 Berlin (Prenzlauer Berg)",
+                kueche: "Chinesisch",
+                preis: "⭐⭐ (10–20€)",
+                special: "🍜 Frische Biang Biang Nudeln",
+                maps: "https://maps.app.goo.gl/jbUwRKGzH8vySFmq5"
+            },
+            {
+                name: "Bursa Uludag Kebapcisi",
+                adresse: "Kolonnenstraße 1, 10827 Berlin (Schöneberg)",
+                kueche: "Türkisch / Döner",
+                preis: "⭐ (ca. 10€)",
+                special: null,
+                maps: "https://maps.app.goo.gl/pgVMVzSraRg3Cp2f7"
+            },
+            {
+                name: "KERB Berlin",
+                adresse: "Potsdamer Straße, 10785 Berlin (Mitte)",
+                kueche: "International",
+                preis: "⭐–⭐⭐⭐",
+                special: "🎪 Food Hall mit 12 Ständen (Fried Chicken, Indian, Korean, Burger, Mexican uvm.)",
+                maps: "https://maps.app.goo.gl/Z84n5wWxqnyyKqbf8"
+            },
+            {
+                name: "Mibap",
+                adresse: "Torstraße 22, 10119 Berlin (Mitte)",
+                kueche: "Taiwanese",
+                preis: "⭐⭐",
+                special: null,
+                maps: "https://maps.app.goo.gl/6DNJeMGeE5gKfZEp6"
+            },
+            {
+                name: "Samake Fish & Seafood",
+                adresse: "Badstraße 21, 13357 Berlin",
+                kueche: "Seafood",
+                preis: "⭐–⭐⭐⭐⭐⭐⭐⭐ (10–70€)",
+                special: "🐟 Frischer Fisch & Meeresfrüchte",
+                maps: "https://maps.app.goo.gl/XkYzpN1W95aQRSND6"
+            },
+            {
+                name: "Tony Roma's Berlin",
+                adresse: "Uber-Platz vor der Uber-Arena, 10243 Berlin (Friedrichshain)",
+                kueche: "TexMex / BBQ",
+                preis: "⭐⭐⭐–⭐⭐⭐⭐ (30–40€)",
+                special: "🍖 Southern & Ribs Special",
+                maps: "https://maps.app.goo.gl/ao2k3NXCBEYCzWVt8"
+            }
+        ]
+    };
+
+    let currentTab = 'fruehstueck';
+    let targetUrl = '';
+
+    function renderList() {
+        const container = document.getElementById('restaurantContainer');
+        container.innerHTML = '';
+
+        data[currentTab].forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'restaurant-card';
+
+            let specialHtml = item.special ? `<div class="res-special">${item.special}</div>` : '';
+
+            card.innerHTML = `
+                <div class="card-header">
+                    <div class="res-title">${item.name}</div>
+                    <div class="res-cuisine">${item.kueche}</div>
+                </div>
+                <div class="res-address">📍 ${item.adresse}</div>
+                ${specialHtml}
+                <div class="card-footer">
+                    <div class="res-price">${item.preis}</div>
+                    <a href="${item.maps}" target="_blank" class="map-link">🗺️ In Maps öffnen</a>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        renderList();
+    }
+
+    // Modal Funktionen
+    function openExternalLink(url) {
+        targetUrl = url;
+        document.getElementById('linkModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('linkModal').style.display = 'none';
+    }
+
+    document.getElementById('confirmLinkBtn').addEventListener('click', () => {
+        window.open(targetUrl, '_blank');
+        closeModal();
+    });
+
+    // Erster Aufruf
+    renderList();
+</script>
+
+</body>
+</html>

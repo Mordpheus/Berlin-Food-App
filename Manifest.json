@@ -1,0 +1,23 @@
+{
+  "name": "Berlin Food Liste für Schnumami",
+  "short_name": "SchnuFood",
+  "description": "Kulinarischer Guide für Schnumami, Taddy und King Schnu in Berlin",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff7d6",
+  "theme_color": "#f4c430",
+  "icons": [
+    {
+      "src": "schnuddi_icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "schnuddi_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
