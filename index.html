@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Berlin Food Liste für Schnumami</title>
+  <meta name="description" content="Kulinarischer Guide für Schnumami, Taddy und King Schnu in Berlin">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" type="image/png" href="./schnuddi_icon.png">
+  <meta name="theme-color" content="#f4c430">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #fff7d6;
+      color: #2f2f2f;
+    }
+    header {
+      text-align: center;
+      padding: 24px 16px;
+      background: #f4c430;
+    }
+    header img {
+      width: 88px;
+      height: 88px;
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    }
+    h1 {
+      margin: 12px 0 4px;
+      font-size: 1.8rem;
+    }
+    p.subtitle {
+      margin: 0;
+    }
+    main {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .restaurant-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .restaurant {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .restaurant h2 {
+      margin: 0 0 8px;
+      font-size: 1.1rem;
+    }
+    .restaurant p {
+      margin: 4px 0;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="./schnuddi_icon.png" alt="Schnuddi Icon">
+    <h1>Berlin Food Liste für Schnumami</h1>
+    <p class="subtitle">Kulinarischer Guide für Schnumami, Taddy und King Schnu in Berlin</p>
+  </header>
+
+  <main>
+    <section id="restaurants" class="restaurant-list"></section>
+  </main>
+
+  <script>
+    const restaurants = [
+      {
+        name: 'Mustafa\'s Gemüse Kebap',
+        district: 'Kreuzberg',
+        cuisine: 'Kebab',
+        notes: 'Legendärer Gemüsekebab, meist lange Schlange.'
+      },
+      {
+        name: 'Cocolo Ramen',
+        district: 'Mitte',
+        cuisine: 'Ramen',
+        notes: 'Beliebt für Tonkotsu und vegetarische Brühen.'
+      },
+      {
+        name: 'Hamy Café',
+        district: 'Neukölln',
+        cuisine: 'Vietnamesisch',
+        notes: 'Preiswerte Bowls und Curry-Gerichte in lockerer Atmosphäre.'
+      },
+      {
+        name: '999 Phở',
+        district: 'Friedrichshain',
+        cuisine: 'Vietnamesisch',
+        notes: 'Authentische Phở und Sommerrollen.'
+      },
+      {
+        name: 'W - Der Imbiss',
+        district: 'Prenzlauer Berg',
+        cuisine: 'Indisch / Street Food',
+        notes: 'Wraps und Currys mit kreativen Toppings.'
+      },
+      {
+        name: 'Azzam',
+        district: 'Sonnenallee',
+        cuisine: 'Arabisch',
+        notes: 'Große Auswahl an Mezze, Grill und Falafel.'
+      }
+    ];
+
+    const restaurantContainer = document.getElementById('restaurants');
+
+    restaurants.forEach(({ name, district, cuisine, notes }) => {
+      const card = document.createElement('article');
+      card.className = 'restaurant';
+      card.innerHTML = `
+        <h2>${name}</h2>
+        <p><strong>Bezirk:</strong> ${district}</p>
+        <p><strong>Küche:</strong> ${cuisine}</p>
+        <p>${notes}</p>
+      `;
+      restaurantContainer.appendChild(card);
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js'));
+    }
+  </script>
+</body>
+</html>
